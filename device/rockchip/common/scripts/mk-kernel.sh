@@ -55,7 +55,7 @@ do_build()
 			;;
 		kernel*)
 			kernel/scripts/config --file kernel/.config -d CONFIG_DEBUG_INFO
-			kernel/scripts/config --file kernel/.config -d CC_OPTIMIZE_FOR_PERFORMANCE_O3
+			kernel/scripts/config --file kernel/.config -e CC_OPTIMIZE_FOR_PERFORMANCE_O3
 
 			mkdir -pv rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 			_rpmbuild_topdir="$(realpath rpmbuild)"
