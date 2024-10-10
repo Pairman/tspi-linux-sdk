@@ -54,6 +54,15 @@ do_build()
 				"$KERNEL_CONFIG_DIR/$RK_KERNEL_CFG"
 			;;
 		kernel*)
+			kernel/scripts/config --file kernel/.config -d CONFIG_DEBUG_INFO
+			kernel/scripts/config --file kernel/.config -d CC_OPTIMIZE_FOR_PERFORMANCE_O3
+
+			mkdir -pv rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+			_rpmbuild_topdir="$(realpath rpmbuild)"
+			export RPMOPTS="--define '_topdir ${_rpmbuild_topdir}'"
+			export EXTRAVERSION="tspi"
+			run_command $KMAKE binrpm-pkg
+
 			run_command $KMAKE "$RK_KERNEL_DTS_NAME.img"
 
 			# The FIT image for initrd would be packed in rootfs stage
@@ -88,6 +97,7 @@ usage_hook()
 clean_hook()
 {
 	make -C kernel distclean
+	rm -rf rpmbuild/
 }
 
 INIT_CMDS="default $KERNELS"

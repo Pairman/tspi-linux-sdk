@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+alias ut="sudo tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool"
+
+if [ -z "$1" ]; then
+	ut ld
+else
+	ut uf "$1"
+fi

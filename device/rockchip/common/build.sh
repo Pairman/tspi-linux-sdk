@@ -1791,7 +1791,9 @@ function build_updateimg(){
 			RK_ROOTFS_SYSTEM="ubuntu-2204"
 		elif [ "x$RK_ROOTFS_SYSTEM" == "xmanjaro" ];then
 			RK_ROOTFS_SYSTEM="manjaro"
-
+		elif [ "x$RK_ROOTFS_SYSTEM" == "xfedora" ];then
+			RK_ROOTFS_SYSTEM="fedora"
+		fi
 
 		DATE=`date +%Y%m%d-%H%M%S`
 		echo "$IMAGE_PATH/update-${RK_KERNEL_DTS/\//-}-$RK_ROOTFS_SYSTEM-$LCD_NAME-$DATE.img"
@@ -1992,7 +1994,7 @@ for option in ${OPTIONS}; do
 			exit 1 ;;
 		menuconfig) build_menuconfig ;;
 		modules) build_modules ;;
-		rootfs|buildroot|debian|yocto|ubuntu) build_rootfs $option ;;
+		rootfs|buildroot|debian|yocto|ubuntu|fedora) build_rootfs $option ;;
 		pcba) build_pcba ;;
 		ramboot) build_ramboot ;;
 		recovery) build_recovery ;;

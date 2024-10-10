@@ -205,6 +205,59 @@ build_ubuntu()
 	fi
 }
 
+build_fedora()
+{
+	# To build fedora, first need to mount image, than install kernel module into fedora
+	if [ ! -f fedora/fedora.tar.xz ]; then
+		echo -e "找不到fedora Rootfs Tar 包"
+		return -1
+	else
+
+		echo "==============Start building fedora =============="
+		echo "TARGET_ARCH          =$RK_KERNEL_ARCH"
+		echo "TARGET_KERNEL_CONFIG =$RK_KERNEL_CFG"
+		echo "TARGET_KERNEL_CONFIG_FRAGMENT =$RK_KERNEL_CFG_FRAGMENTS"
+		echo "=================================================="
+
+		echo "Decompress fedora rootfs"
+		mkdir -p fedora/.fedora-rootfs
+		sudo tar xf fedora/fedora.tar.xz -C fedora/.fedora-rootfs
+
+		if [ "${RK_KERNEL_DISTROBOOT}" = "y" ]; then
+			echo "Build rootfs distroboot"
+			build_rootfs_distroboot
+		fi 
+
+		cd ${SDK_DIR}
+		echo "Build and install kernel module"
+		mkdir -p ${SDK_DIR}/fedora/.kernel_module_install
+		$KMAKE INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=${SDK_DIR}/fedora/.kernel_module_install modules_install
+
+		sudo cp -ax fedora/.kernel_module_install/lib/modules fedora/.fedora-rootfs/lib
+
+		echo "Copy firmware"
+		if [ ! -d fedora/.fedora-rootfs/vendor/etc/firmware ]; then
+			sudo mkdir -p fedora/.fedora-rootfs/vendor/etc/firmware
+		fi
+		sudo cp -ax ${SDK_DIR}/firmware/* fedora/.fedora-rootfs/vendor/etc/firmware
+
+		echo "Pack fedora rootfs"
+		cd ${SDK_DIR}
+		dd if=/dev/zero of=fedora/fedora-rootfs.img bs=1G count=4
+		mkfs.ext4 fedora/fedora-rootfs.img
+		mkdir -p fedora/.fedora-rootfs-img
+		sudo mount -o loop fedora/fedora-rootfs.img fedora/.fedora-rootfs-img
+		sudo cp -ax fedora/.fedora-rootfs/* fedora/.fedora-rootfs-img/
+
+		sudo umount fedora/.fedora-rootfs-img/
+		e2fsck -p -f fedora/fedora-rootfs.img
+		resize2fs -M fedora/fedora-rootfs.img
+
+		echo "Finish build fedora rootfs image, clean tmp file"
+		sudo rm -rf fedora/.fedora* fedora/.kernel*
+	fi
+}
+
 # Hooks
 
 usage_hook()
@@ -248,7 +301,7 @@ pre_build_hook()
 	finish_build $@
 }
 
-BUILD_CMDS="rootfs buildroot debian yocto ubuntu"
+BUILD_CMDS="rootfs buildroot debian yocto ubuntu fedora"
 build_hook()
 {
 	check_config RK_ROOTFS_TYPE || return 0
@@ -258,6 +311,8 @@ build_hook()
 	else
 		ROOTFS=$1
 	fi
+
+	ROOTFS=fedora
 
 	ROOTFS_IMG=rootfs.${RK_ROOTFS_TYPE}
 	ROOTFS_DIR="$RK_OUTDIR/rootfs"
@@ -297,7 +352,18 @@ build_hook()
 				ln -srf ubuntu/ubuntu-rootfs.img $ROOTFS_DIR/$ROOTFS_IMG
 			fi
 			;;
-
+		fedora)
+			build_fedora
+			if [ ! -f fedora/fedora-rootfs.img ]; then
+				echo ""
+				echo -e "\033[31m找不到fedora.img文件，请先将网盘链接中的fedora镜像放到fedora/文件夹下，并确保名称为fedora.img\033[0m"
+				echo -e "\033[31mfedora.img file cannot be found.\033[0m"
+				echo -e "\033[31mPlease put the fedora image from the network disk link under fedora/ folder first, and make sure the name is fedora.img.\033[0m"
+				echo ""
+			else
+				ln -srf fedora/fedora-rootfs.img $ROOTFS_DIR/$ROOTFS_IMG
+			fi
+			;;
 		manjaro)
 			build_manjaro
 			if [ ! -f manjaro/manjaro-rootfs.img ]; then

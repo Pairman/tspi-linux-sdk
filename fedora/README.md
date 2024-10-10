@@ -1,0 +1,1 @@
+Builds rootfs for Fedora. Place your ```fedora.tar.xz``` here.
