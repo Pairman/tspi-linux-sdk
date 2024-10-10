@@ -1,0 +1,23 @@
+diff -urN a/scripts/package/mkspec b/scripts/package/mkspec
+--- a/scripts/package/mkspec	2024-10-09 16:49:38.446550495 +0800
++++ b/scripts/package/mkspec	2024-10-09 16:50:49.692545820 +0800
+@@ -39,8 +39,8 @@
+ #  $S: this line is enabled only when building source package
+ #  $M: this line is enabled only when CONFIG_MODULES is enabled
+ sed -e '/^DEL/d' -e 's/^\t*//' <<EOF
+-	Name: kernel
+-	Summary: The Linux Kernel
++	Name: kernel-tspi
++	Summary: The Linux Kernel for Taishan Pi
+ 	Version: $__KERNELRELEASE
+ 	Release: $(cat .version 2>/dev/null || echo 1)
+ 	License: GPL
+@@ -56,7 +56,7 @@
+ 	%define debug_package %{nil}
+ 
+ 	%description
+-	The Linux Kernel, the operating system core itself
++	The Linux Kernel, the operating system core itself, for Taishan Pi
+ 
+ 	%package headers
+ 	Summary: Header files for the Linux kernel for use by glibc
