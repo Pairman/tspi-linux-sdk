@@ -1,5 +1,6 @@
-# TSPI-Linux SDK
+Modified [CmST0us/tspi-linux-sdk](https://github.com/CmST0us/tspi-linux-sdk.git) for building Fedora.
 
+# TSPI-Linux SDK
 泰山派Linux SDK
 基于Rockchip原厂 `rk4.1-202305` 版本
 
