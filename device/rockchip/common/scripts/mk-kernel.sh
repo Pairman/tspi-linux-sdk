@@ -54,9 +54,10 @@ do_build()
 				"$KERNEL_CONFIG_DIR/$RK_KERNEL_CFG"
 			;;
 		kernel*)
-			kernel/scripts/config --file kernel/.config -d CONFIG_DEBUG_INFO
-			kernel/scripts/config --file kernel/.config -e CC_OPTIMIZE_FOR_PERFORMANCE_O3
-
+			cat kernel-configs/common.config >> kernel/.config
+			cat kernel-configs/net.config >> kernel/.config
+			cat kernel-configs/security.config >> kernel/.config
+			make oldconfig
 			mkdir -pv rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 			_rpmbuild_topdir="$(realpath rpmbuild)"
 			export RPMOPTS="--define '_topdir ${_rpmbuild_topdir}'"
