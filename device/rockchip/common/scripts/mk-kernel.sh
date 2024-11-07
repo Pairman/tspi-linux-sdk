@@ -57,6 +57,7 @@ do_build()
 			cat kernel-configs/common.config >> kernel/.config
 			cat kernel-configs/net.config >> kernel/.config
 			cat kernel-configs/security.config >> kernel/.config
+			cat kernel-configs/sensors.config >> kernel/.config
 			make oldconfig
 			mkdir -pv rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 			_rpmbuild_topdir="$(realpath rpmbuild)"
